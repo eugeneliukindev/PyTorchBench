@@ -1,0 +1,66 @@
+experiment:
+  name: some_name
+  paths:
+    root_path: some_experiment
+
+    model_path: models/model.pth
+    best_model_path: models/best_model.pth
+
+    optimizer_path: optim/optimizer.pth
+    best_optimizer_path: optim/best_optimizer.pth
+
+    train_metrics_path: metrics/train_metrics.csv
+    val_metrics_path: metrics/val_metrics.csv
+    test_metrics_path: metrics/test_metrics.csv
+
+    graph_path: progress.png
+    config_snapshot: config_snapshot.yaml
+    logs_path: logs.log
+
+logger:
+  level: DEBUG
+
+train:
+  enabled: true
+  epochs: 50
+
+test:
+  enabled: true
+
+dataset:
+  obj: src.data.datasets.ImageClassificationDataset
+  init_params:
+    path: datasets/fruits_classification
+    transforms:
+      obj: torchvision.models.ResNet101_Weights.DEFAULT.transforms
+      init_params: { }
+  post_params:
+    batch_size: 32
+
+model:
+  obj: torchvision.models.resnet101
+  init_params:
+    weights:
+      obj: torchvision.models.ResNet101_Weights.DEFAULT
+      init_params: null
+  post_params:
+    out_features: 12
+    freeze_pretrained_weights: true
+
+criterion:
+  obj: torch.nn.CrossEntropyLoss
+  init_params: { }
+
+optimizer:
+  obj: torch.optim.Adam
+  init_params: { }
+
+scheduler:
+  obj: torch.optim.lr_scheduler.ReduceLROnPlateau
+  init_params: { }
+
+metric_tracker:
+  obj: torchmetrics.Accuracy
+  init_params:
+    task: multiclass
+    num_classes: 12

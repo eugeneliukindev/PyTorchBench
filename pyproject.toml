@@ -1,0 +1,62 @@
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "pytorchbench"
+version = "0.1.0"
+description = ""
+authors = ["Eugene Liukin"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.12,<3.13"
+torch = { version = "^2.6.0", source = "pytorch" }
+torchvision = { version = "^0.21.0", source = "pytorch" }
+numpy = "^1.26.1"
+torchmetrics = "^1.7.0"
+pydantic = "^2.11.2"
+pyyaml = "^6.0.2"
+matplotlib = "^3.10.1"
+tqdm = "^4.67.1"
+
+[[tool.poetry.source]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cu126/"
+priority = "explicit"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.15.0"
+black = "^25.1.0"
+pytest = "^8.3.5"
+
+[tool.mypy]
+plugins = "pydantic.mypy"
+python_version = "3.12"
+show_error_codes = true
+show_error_context = true
+pretty = true
+ignore_missing_imports = false
+warn_unused_configs = true
+disallow_subclassing_any = true
+disallow_any_generics = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_unreachable = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_return_any = true
+follow_imports_for_stubs = true
+namespace_packages = true
+show_absolute_path = true
+
+[tool.black]
+line-length = 120
+
+[tool.pylint.format]
+max-line-length = 120
