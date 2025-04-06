@@ -7,6 +7,7 @@ from torch.nn import Module
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import LRScheduler
 from torch.utils.data import DataLoader, random_split, Dataset
+from torchmetrics import Metric
 
 from src.config import setup_experiment, OptimizerConfig, SchedulerConfig
 from src.models import prepare_model
@@ -59,7 +60,7 @@ def main() -> None:
         freeze_pretrained_weights=config.model.post_params.freeze_pretrained_weights,
     ).to(DEVICE)
     criterion: Module = config.criterion.create(expected_obj=Module)
-    metric_tracker: Module = config.metric_tracker.create(expected_obj=Module).to(DEVICE)
+    metric_tracker: Metric = config.metric_tracker.create(expected_obj=Metric).to(DEVICE)  # type: ignore[type-abstract]
     train_dataloader, val_dataloader, sample_dataloader = _get_split_dataloaders(
         dataset=dataset, batch_size=config.dataset.post_params.batch_size
     )

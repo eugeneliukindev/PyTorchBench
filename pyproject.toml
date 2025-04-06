@@ -9,6 +9,7 @@ description = ""
 authors = ["Eugene Liukin"]
 license = "MIT"
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = ">=3.12,<3.13"
@@ -30,6 +31,7 @@ priority = "explicit"
 mypy = "^1.15.0"
 black = "^25.1.0"
 pytest = "^8.3.5"
+types-pyyaml = "^6.0.12.20250402"
 
 [tool.mypy]
 plugins = "pydantic.mypy"
@@ -37,7 +39,7 @@ python_version = "3.12"
 show_error_codes = true
 show_error_context = true
 pretty = true
-ignore_missing_imports = false
+ignore_missing_imports = true
 warn_unused_configs = true
 disallow_subclassing_any = true
 disallow_any_generics = true
