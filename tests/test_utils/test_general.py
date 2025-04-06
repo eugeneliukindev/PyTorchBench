@@ -66,12 +66,18 @@ def yaml_file(temp_file) -> Path:
             pytest.raises(ModuleNotFoundError, match="No module named 'invalid'"),
         ),
         (42, NO_RESULT, pytest.raises(TypeError, match="Expected str, got int")),
+        (
+            "path_without_dot",
+            NO_RESULT,
+            pytest.raises(ImportError, match="No module named 'path_without_dot'"),
+        ),
     ],
     ids=[
         # success cases
         "resnet18",
         "linear_layer",
         # exception cases
+        "invalid_module_name",
         "invalid_import_path",
         "invalid_type",
     ],
@@ -143,9 +149,7 @@ class TestCSV:
                 {"epoch": 1, "loss": 1.0},
                 "z",
                 NO_RESULT,
-                pytest.raises(
-                    ValueError, match="Invalid mode: z. Expected one of 'w', 'a', 'x'."
-                ),
+                pytest.raises(ValueError, match="Invalid mode: z. Expected one of 'w', 'a', 'x'."),
             ),
         ],
         ids=[
@@ -204,9 +208,7 @@ class TestCSV:
             "invalid_reader_type",
         ],
     )
-    def test_load_from_csv(
-        self, tmp_path, data, reader_type, expected_result, expectation
-    ):
+    def test_load_from_csv(self, tmp_path, data, reader_type, expected_result, expectation):
         csv_path = tmp_path / "test.csv"
         csv_path.write_text(data)
         with expectation:
@@ -271,9 +273,7 @@ class TestCSV:
         "empty_metrics",
     ],
 )
-def test_save_graph(
-    request: SubRequest, tmp_path, train_metrics, val_metrics, expectation
-):
+def test_save_graph(request: SubRequest, tmp_path, train_metrics, val_metrics, expectation):
     if isinstance(train_metrics, str):
         train_metrics = request.getfixturevalue(train_metrics)
     if isinstance(val_metrics, str):
