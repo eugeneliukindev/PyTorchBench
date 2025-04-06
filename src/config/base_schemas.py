@@ -19,9 +19,9 @@ class ObjectFactory(BaseModel):
     and handling callable objects with parameters. It is designed to work with complex nested
     structures including dictionaries, sequences, and string-based import paths.
 
-    Attributes:
+    Args:
         obj (Any): The main object to process, either as a direct object or a string import path.
-        init_params (Mapping[str, Any], optional): Optional parameters for the object, if it is callable.
+        init_params (Mapping[str, Any] | None): Optional parameters for the object, if it is callable.
 
     Examples:
         >>> test1 = ObjectFactory(
@@ -34,7 +34,7 @@ class ObjectFactory(BaseModel):
         ...     }
         ... )
         >>> test1  # doctest: +ELLIPSIS
-        BaseConfig(obj=<function resnet101 at ...>, init_params={'weights': ResNet101_Weights.IMAGENET1K_V2})
+        ObjectFactory(obj=<function resnet101 at ...>, init_params={'weights': ResNet101_Weights.IMAGENET1K_V2})
         >>> test1.create()  # doctest: +ELLIPSIS
         ResNet(...)
 
@@ -43,7 +43,7 @@ class ObjectFactory(BaseModel):
         ...     init_params={}
         ... )
         >>> test2
-        BaseConfig(obj=<class 'torch.nn.modules.loss.CrossEntropyLoss'>, init_params={})
+        ObjectFactory(obj=<class 'torch.nn.modules.loss.CrossEntropyLoss'>, init_params={})
         >>> test2.create()
         CrossEntropyLoss()
 
@@ -57,13 +57,13 @@ class ObjectFactory(BaseModel):
         ...     }
         ... )
         >>> test3  # doctest: +ELLIPSIS
-        BaseConfig(obj=<class 'torch.nn.modules.container.Sequential'>, init_params={'args': [...]})
+        ObjectFactory(obj=<class 'torch.nn.modules.container.Sequential'>, init_params={'args': [...]})
         >>> test3.create()  # doctest: +ELLIPSIS
         Sequential(...)
 
     Notes:
-        If `init_params` is `None`, the `get_obj` method returns the object passed to `obj` as is.
-        If `init_params` is provided as a `Mapping`, the `get_obj` method calls `obj(*args, **kwargs)` where
+        If `init_params` is `None`, the `create` method returns the object passed to `obj` as is.
+        If `init_params` is provided as a `Mapping`, the `create` method calls `obj(*args, **kwargs)` where
         `args` is taken from `init_params["args"]` if present, and `kwargs` includes remaining parameters
         combined with any additional parameters.
     """
@@ -188,6 +188,83 @@ class TestConfig(BaseModel):
 
 
 class Config(BaseModel):
+    """
+    A configuration class that defines the structure for an experiment setup, including model, dataset,
+    training, testing, and logging configurations. Inherits from `BaseModel` (assumed to be from a library
+    like Pydantic for validation).
+
+    This class encapsulates all necessary settings to run a machine learning experiment, supporting nested
+    object specifications resolved via an `ObjectFactory`-like mechanism (assumed for `obj` and `init_params`).
+
+    Args:
+        experiment (ExperimentConfig): Configuration for experiment paths and metadata.
+        model (ModelConfig): Configuration for the model architecture and its parameters.
+        dataset (DatasetConfig): Configuration for the dataset and its preprocessing.
+        criterion (CriterionConfig): Configuration for the loss function.
+        optimizer (OptimizerConfig | None): Configuration for the optimizer (optional, can be None in test-only mode).
+        scheduler (SchedulerConfig | None): Configuration for the learning rate scheduler (optional, can be None in test-only mode).
+        metric_tracker (MetricTrackerConfig): Configuration for tracking performance metrics.
+        train (TrainConfig): Configuration for training settings.
+        test (TestConfig): Configuration for testing settings.
+        logger (LoggerConfig): Configuration for logging settings.
+
+    Examples:
+        >>> config = Config(
+        ...     experiment=ExperimentConfig(
+        ...         name="some_name",
+        ...         paths={
+        ...             "root_path": "some_experiment",
+        ...             "model_path": "models/model.pth",
+        ...             "best_model_path": "models/best_model.pth",
+        ...             "optimizer_path": "optim/optimizer.pth",
+        ...             "best_optimizer_path": "optim/best_optimizer.pth",
+        ...             "train_metrics_path": "metrics/train_metrics.csv",
+        ...             "val_metrics_path": "metrics/val_metrics.csv",
+        ...             "test_metrics_path": "metrics/test_metrics.csv",
+        ...             "graph_path": "progress.png",
+        ...             "config_snapshot": "config_snapshot.yaml",
+        ...             "logs_path": "logs.log"
+        ...         }
+        ...     ),
+        ...     logger=LoggerConfig(level="DEBUG"),
+        ...     train=TrainConfig(enabled=True, epochs=50),
+        ...     test=TestConfig(enabled=True),
+        ...     dataset=DatasetConfig(
+        ...         obj="src.data.datasets.ImageClassificationDataset",
+        ...         init_params={"path": "datasets/fruits_classification", "transforms": {
+        ...             "obj": "torchvision.models.ResNet101_Weights.DEFAULT.transforms",
+        ...             "init_params": {}
+        ...         }},
+        ...         post_params={"batch_size": 32}
+        ...     ),
+        ...     model=ModelConfig(
+        ...         obj="torchvision.models.resnet101",
+        ...         init_params={"weights": {
+        ...             "obj": "torchvision.models.ResNet101_Weights.DEFAULT",
+        ...             "init_params": None
+        ...         }},
+        ...         post_params={"out_features": 12, "freeze_pretrained_weights": True}
+        ...     ),
+        ...     criterion=CriterionConfig(obj=torch.nn.CrossEntropyLoss, init_params={}),
+        ...     optimizer=OptimizerConfig(obj=torch.optim.Adam, init_params={}),
+        ...     scheduler=SchedulerConfig(obj="torch.optim.lr_scheduler.ReduceLROnPlateau", init_params={}),
+        ...     metric_tracker=MetricTrackerConfig(
+        ...         obj="torchmetrics.Accuracy",
+        ...         init_params={"task": "multiclass", "num_classes": 12}
+        ...     )
+        ... )
+        >>> config  # doctest: +ELLIPSIS
+        Config(experiment=ExperimentConfig(name='some_name', ...), ...
+
+
+
+    Notes:
+        - Fields marked as `| None` (e.g., `optimizer`, `scheduler`) are optional and can be omitted when only testing is required.
+        - The `obj` and `init_params` pattern suggests compatibility with an object factory that resolves string paths
+          into Python objects (e.g., `torch.nn.CrossEntropyLoss`).
+        - Nested configurations (e.g., `model.init_params.weights`) allow for recursive object instantiation.
+    """
+
     experiment: ExperimentConfig
     model: ModelConfig
     dataset: DatasetConfig
