@@ -2,7 +2,6 @@ from contextlib import nullcontext as does_not_raise
 
 import pytest
 import torch.nn as nn
-
 from src.models import prepare_model
 from tests.conftest import resnet18_model
 

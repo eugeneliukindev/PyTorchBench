@@ -1,7 +1,5 @@
 import logging
-import sys
-from pathlib import Path
-import pytest
+
 from src.utils import configure_logger
 
 

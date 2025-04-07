@@ -1,5 +1,6 @@
-from copy import deepcopy
-from pathlib import Path
+import argparse
+from contextlib import nullcontext as does_not_raise
+from unittest.mock import patch
 
 import pytest
 import torchvision
@@ -8,11 +9,8 @@ import src
 from src.config.experiment import (
     _check_critical_component_changes,
     CRITICAL_COMPONENTS,
-    CriticalComponent,
     setup_experiment,
 )
-from tests.conftest import NO_RESULT
-from contextlib import nullcontext as does_not_raise
 
 
 @pytest.mark.parametrize(
@@ -130,9 +128,7 @@ from contextlib import nullcontext as does_not_raise
         "multiple_changes_train",
     ],
 )
-def test_check_critical_component_changes(
-    config_dict, changes, critical_components, expectation
-):
+def test_check_critical_component_changes(config_dict, changes, critical_components, expectation):
     current_config = config_dict.copy()
     previous_config = config_dict.copy()
 
@@ -150,12 +146,12 @@ def test_setup_experiment(tmp_path, config_yaml):
     config_path = tmp_path / "config.yaml"
     config_path.write_text(config_yaml)
 
-    config = setup_experiment(config_path)
+    args = argparse.Namespace(config=str(config_path))
+
+    with patch("src.config.experiment._parse_args", return_value=args):
+        config = setup_experiment()
 
     assert config.model.obj == torchvision.models.resnet101
-    assert (
-        config.model.init_params["weights"]
-        == torchvision.models.ResNet101_Weights.DEFAULT
-    )
+    assert config.model.init_params["weights"] == torchvision.models.ResNet101_Weights.DEFAULT
     assert config.dataset.obj == src.data.datasets.ImageClassificationDataset
     assert config.train.enabled is True

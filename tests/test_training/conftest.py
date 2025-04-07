@@ -9,8 +9,7 @@ from torch.utils.data import TensorDataset, DataLoader
 from torchmetrics import Metric
 from tqdm import tqdm
 
-from src.training import run_test, EngineMetrics
-from src.training.engine import run_engine_step
+from src.training import EngineMetrics
 
 
 @pytest.fixture(scope="package")

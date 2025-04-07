@@ -1,16 +1,12 @@
-import os
 import re
 from contextlib import nullcontext as does_not_raise
 from pathlib import Path
-from typing import Any
 
 import pytest
 import torchvision
-import yaml
 from PIL import Image
-from _pytest.fixtures import SubRequest, FixtureRequest
+from _pytest.fixtures import SubRequest
 from torch import nn as nn
-from torchvision.models import ResNet
 
 from src.training import TrainMetrics, ValidationMetrics
 from src.utils import (
@@ -21,7 +17,6 @@ from src.utils import (
     load_from_csv,
     save_graph,
 )
-from src.utils.general import _extract_metrics
 from tests.conftest import NO_RESULT, config_dict
 
 

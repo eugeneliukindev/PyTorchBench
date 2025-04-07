@@ -1,8 +1,9 @@
+from contextlib import nullcontext as does_not_raise
+
 import pytest
 
 from src.training.engine import run_engine_step
 from tests.test_training.conftest import assert_engine_metrics
-from contextlib import nullcontext as does_not_raise
 
 
 class TestTrainingEngine:
