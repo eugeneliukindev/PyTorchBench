@@ -80,7 +80,7 @@ def run_train(
             tqdm(
                 val_dataloader,
                 total=len(val_dataloader),
-                desc=f"Epoch {epoch + 1}/{epochs} Validate",
+                desc=f"Epoch {epoch}/{epochs} Validate",
                 leave=True,
                 colour="white",
             )
