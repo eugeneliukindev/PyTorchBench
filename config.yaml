@@ -1,7 +1,7 @@
 experiment:
   name: some_name
   paths:
-    root_path: some_experiment
+    root_path: experiments/fruits_classification
 
     model_path: models/model.pth
     best_model_path: models/best_model.pth
