@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, model_validator, Field
 from src.config.additional_schemas import ExperimentPaths, ModelPostParams, DatasetPostParams
 from src.utils import get_object_from_import_path
 
-_T = TypeVar("_T")
+T = TypeVar("T")
 
 
 class ObjectFactory(BaseModel):
@@ -124,13 +124,13 @@ class ObjectFactory(BaseModel):
     def create(self, expected_obj: None = None, **additional_params: Any) -> Any: ...
 
     @overload
-    def create(self, expected_obj: type[_T], **additional_params: Any) -> _T: ...
+    def create(self, expected_obj: type[T], **additional_params: Any) -> T: ...
 
     def create(
         self,
-        expected_obj: type[_T] | None = None,
+        expected_obj: type[T] | None = None,
         **additional_params: Any,
-    ) -> Any | _T:
+    ) -> Any | T:
         if callable(self.obj) and self.init_params is not None:
             init_params = dict(self.init_params) | additional_params
             if "args" in init_params:

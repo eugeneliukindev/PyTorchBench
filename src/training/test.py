@@ -1,5 +1,5 @@
 import logging
-from typing import Any
+from typing import Any, TypeVar
 
 import torch
 from torch.nn import Module
@@ -7,17 +7,18 @@ from torch.utils.data import DataLoader, Dataset
 from torchmetrics import Metric
 from tqdm import tqdm
 
-from src.data import TensorDataloader
 from .engine import run_engine_step
 from .metrics import EngineMetrics
 
 log = logging.getLogger(__name__)
 
+T = TypeVar("T")
+
 
 @torch.no_grad()
 def run_test(
     model: Module,
-    dataloader: DataLoader[Dataset[Any]],
+    dataloader: DataLoader[T],
     criterion: Module,
     accuracy_metrics: Metric,
     progress: bool = True,
@@ -25,7 +26,7 @@ def run_test(
     if not isinstance(progress, bool):
         raise TypeError("progress must be a boolean")
     log.info("Starting testing")
-    iterable: tqdm[TensorDataloader] | TensorDataloader = (
+    iterable: tqdm[DataLoader[T]] | DataLoader[T] = (
         tqdm(
             dataloader,
             total=len(dataloader),

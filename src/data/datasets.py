@@ -8,10 +8,7 @@ import torch
 from PIL import Image
 from torch import Tensor
 from torch.nn import Module
-from torch.utils.data import Dataset, DataLoader
-
-type TensorDataset = Dataset[tuple[Tensor, ...]]
-type TensorDataloader = DataLoader[TensorDataset]
+from torch.utils.data import Dataset
 
 type ClassLabel = int
 type ClassLabelTensor = torch.LongTensor
@@ -67,9 +64,7 @@ class ImageClassificationDataset(AbstractDataset[ImageClassificationOutput]):
     def _load_data(self) -> None:
         dir_content_paths = sorted(self.path.iterdir())
         class_dirs_list = [d for d in dir_content_paths if d.is_dir()]
-        self.class_dirs: dict[int, str] = {
-            i: d.name for i, d in enumerate(class_dirs_list)
-        }
+        self.class_dirs: dict[int, str] = {i: d.name for i, d in enumerate(class_dirs_list)}
 
         self._data: list[tuple[int, str]] = []
         for idx, class_name in self.class_dirs.items():
@@ -83,12 +78,8 @@ class ImageClassificationDataset(AbstractDataset[ImageClassificationOutput]):
         image: Image.Image = Image.open(image_path).convert("RGB")
         tensor_image: Tensor = self.transforms(image)
         if not isinstance(tensor_image, torch.Tensor):
-            raise TypeError(
-                f"Transforms must return torch.Tensor, got {type(tensor_image).__name__}"
-            )
+            raise TypeError(f"Transforms must return torch.Tensor, got {type(tensor_image).__name__}")
         tensor_image = tensor_image.to(self.device)
-        tensor_class: Tensor = torch.tensor(class_index, dtype=torch.long).to(
-            self.device
-        )
+        tensor_class: Tensor = torch.tensor(class_index, dtype=torch.long).to(self.device)
 
         return tensor_image, tensor_class

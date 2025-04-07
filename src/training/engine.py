@@ -1,5 +1,6 @@
+import logging
 import time
-from typing import cast
+from typing import cast, TypeVar
 
 import torch
 from torch.nn import Module
@@ -8,18 +9,18 @@ from torch.utils.data import DataLoader
 from torchmetrics import Metric
 from tqdm import tqdm
 
-from src.data import TensorDataloader
 from .metrics import EngineMetrics
-import logging
 
 log = logging.getLogger(__name__)
+
+T = TypeVar("T")
 
 
 def _validate_engine(
     model: Module,
     criterion: Module,
     accuracy_metrics: Metric,
-    iterable: tqdm | TensorDataloader,
+    iterable: tqdm | DataLoader[T],
     is_training: bool,
     optimizer: Optimizer | None = None,
 ) -> bool:
@@ -52,7 +53,7 @@ def run_engine_step(
     model: Module,
     criterion: Module,
     accuracy_metrics: Metric,
-    iterable: tqdm | TensorDataloader,
+    iterable: tqdm | DataLoader[T],
     is_training: bool,
     optimizer: Optimizer | None = None,
 ) -> EngineMetrics:

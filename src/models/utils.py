@@ -5,7 +5,7 @@ from torchvision.models import ResNet, VGG
 
 from src.utils.general import log
 
-_T = TypeVar("_T", bound=nn.Module)
+T = TypeVar("T", bound=nn.Module)
 
 
 def _validate_pretrained_model(
@@ -22,10 +22,10 @@ def _validate_pretrained_model(
 
 
 def prepare_model(
-    model: _T,
+    model: T,
     out_features: Annotated[int, "> 0"],
     freeze_pretrained_weights: bool = True,
-) -> _T:
+) -> T:
     _validate_pretrained_model(
         model=model,
         out_features=out_features,
